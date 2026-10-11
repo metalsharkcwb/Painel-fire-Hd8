@@ -1,1 +1,122 @@
-
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#101923">
+<title>Painel Casa — Curitiba</title>
+<style>
+:root{color-scheme:dark;--bg:#101923;--panel:#1b2937;--muted:#a9bacb;--text:#f5f8fc;--accent:#f2c96d}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+body{padding:2.5vh 2.5vw;display:flex;flex-direction:column;gap:2vh}
+header{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.location{font-size:clamp(1rem,2.6vw,1.8rem);font-weight:700;letter-spacing:.04em}
+.sub{color:var(--muted);font-size:clamp(.75rem,1.4vw,1rem);margin-top:.35rem}
+.status{font-size:clamp(.65rem,1.2vw,.9rem);color:var(--muted);text-align:right}
+main{display:grid;grid-template-columns:1.05fr 1fr;gap:2vw;flex:1;min-height:0}
+.card{background:var(--panel);border:1px solid #2b3d4e;border-radius:22px;padding:clamp(14px,2.5vw,30px);min-height:0}
+.clockcard{display:flex;flex-direction:column;justify-content:center}
+.time{font-size:clamp(4rem,12vw,10rem);font-weight:700;line-height:.98;letter-spacing:-.06em;color:var(--accent);font-variant-numeric:tabular-nums}
+.date{font-size:clamp(1rem,2.2vw,1.8rem);color:#dce6ef;margin-top:1.5vh}
+.greeting{font-size:clamp(.8rem,1.5vw,1.1rem);color:var(--muted);margin-top:3vh}
+.weathercard{display:flex;flex-direction:column;justify-content:space-between;gap:1rem}
+.current{display:flex;align-items:center;gap:1vw}
+.icon{font-size:clamp(3rem,7vw,6rem);line-height:1}
+.temp{font-size:clamp(3.2rem,8vw,6.7rem);font-weight:700;letter-spacing:-.05em;line-height:1}
+.condition{font-size:clamp(.9rem,1.8vw,1.4rem);color:#dce6ef;margin-top:.4rem}
+.range{font-size:clamp(.8rem,1.5vw,1.1rem);color:var(--muted);margin-top:.4rem}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+.metric{background:#243546;border-radius:13px;padding:.75rem .6rem;text-align:center}
+.metric .label{font-size:clamp(.65rem,1.15vw,.9rem);color:var(--muted)}
+.metric .value{font-size:clamp(.85rem,1.7vw,1.3rem);font-weight:700;margin-top:.35rem}
+.forecast{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
+.day{background:#243546;border-radius:13px;text-align:center;padding:.7rem .25rem;min-width:0}
+.dayname{font-size:clamp(.65rem,1.25vw,.95rem);color:var(--muted)}
+.dayicon{font-size:clamp(1.4rem,3vw,2.2rem);margin:.35rem 0}
+.daytemp{font-size:clamp(.7rem,1.3vw,1rem);font-weight:700}
+footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:clamp(.65rem,1.2vw,.9rem);min-height:1.2rem}
+#refresh{color:var(--muted)}
+@media (orientation:portrait){body{overflow:auto}main{grid-template-columns:1fr;grid-template-rows:auto auto}.time{font-size:clamp(4rem,18vw,7rem)}.card{padding:18px}.clockcard{min-height:32vh}.weathercard{min-height:48vh}}
+@media (max-height:480px){body{gap:1vh;padding:1.5vh 2vw}main{gap:1.5vw}.card{padding:2vh 2vw;border-radius:16px}.date{margin-top:1vh}.greeting{margin-top:1.5vh}.weathercard{gap:.5rem}.metrics,.forecast{gap:.4rem}.metric,.day{padding:.45rem .2rem}}
+</style>
+</head>
+<body>
+<header>
+ <div><div class="location">⌖ CURITIBA <span style="color:var(--muted);font-weight:400">· PR</span></div><div class="sub">Painel da casa · horário de Brasília</div></div>
+ <div class="status"><div id="connection">Carregando previsão…</div><div id="updated">Dados meteorológicos</div></div>
+</header>
+<main>
+ <section class="card clockcard">
+  <div class="time" id="time">--:--</div>
+  <div class="date" id="date">Carregando data…</div>
+  <div class="greeting" id="greeting">Que seu dia seja ótimo.</div>
+ </section>
+ <section class="card weathercard">
+  <div>
+   <div class="sub" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem">Agora em Curitiba</div>
+   <div class="current"><div class="icon" id="currentIcon">🌤️</div><div><div class="temp"><span id="temp">--</span><span style="font-size:.48em;vertical-align:top">°C</span></div><div class="condition" id="condition">Buscando condições…</div><div class="range" id="range">Mín. --° · Máx. --°</div></div></div>
+  </div>
+  <div class="metrics">
+   <div class="metric"><div class="label">Sensação</div><div class="value" id="feels">--°</div></div>
+   <div class="metric"><div class="label">Umidade</div><div class="value" id="humidity">--%</div></div>
+   <div class="metric"><div class="label">Vento</div><div class="value" id="wind">-- km/h</div></div>
+  </div>
+  <div><div class="sub" style="margin-bottom:.55rem">PRÓXIMOS DIAS</div><div class="forecast" id="forecast">
+   <div class="day"><div class="dayname">Hoje</div><div class="dayicon">⌛</div><div class="daytemp">--° / --°</div></div>
+   <div class="day"><div class="dayname">Amanhã</div><div class="dayicon">⌛</div><div class="daytemp">--° / --°</div></div>
+   <div class="day"><div class="dayname">—</div><div class="dayicon">⌛</div><div class="daytemp">--° / --°</div></div>
+   <div class="day"><div class="dayname">—</div><div class="dayicon">⌛</div><div class="daytemp">--° / --°</div></div>
+  </div></div>
+ </section>
+</main>
+<footer><span>Atualização automática · Curitiba, Paraná</span><span id="refresh">Aguardando conexão</span></footer>
+<script>
+const $=id=>document.getElementById(id);
+const days=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+function clock(){
+ const n=new Date();
+ $('time').textContent=n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',hour12:false});
+ $('date').textContent=n.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ const h=n.getHours(); $('greeting').textContent=h<12?'Bom dia!':h<18?'Boa tarde!':'Boa noite!';
+}
+function wx(code){
+ if(code===0)return ['☀️','Céu limpo'];
+ if([1,2].includes(code))return ['🌤️','Parcialmente nublado'];
+ if(code===3)return ['☁️','Nublado'];
+ if([45,48].includes(code))return ['🌫️','Neblina'];
+ if([51,53,55,56,57].includes(code))return ['🌦️','Garoa'];
+ if([61,63,65,66,67,80,81,82].includes(code))return ['🌧️','Chuva'];
+ if([71,73,75,77,85,86].includes(code))return ['🌨️','Neve'];
+ if([95,96,99].includes(code))return ['⛈️','Trovoadas'];
+ return ['🌡️','Condição atual'];
+}
+async function loadWeather(){
+ const url='https://api.open-meteo.com/v1/forecast?latitude=-25.4284&longitude=-49.2733&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=celsius&wind_speed_unit=kmh&timezone=America%2FSao_Paulo&forecast_days=4';
+ try{
+  const r=await fetch(url,{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status);
+  const d=await r.json(), c=d.current, daily=d.daily, state=wx(c.weather_code);
+  $('temp').textContent=Math.round(c.temperature_2m);
+  $('currentIcon').textContent=state[0]; $('condition').textContent=state[1];
+  $('feels').textContent=Math.round(c.apparent_temperature)+'°';
+  $('humidity').textContent=Math.round(c.relative_humidity_2m)+'%';
+  $('wind').textContent=Math.round(c.wind_speed_10m)+' km/h';
+  $('range').textContent='Mín. '+Math.round(daily.temperature_2m_min[0])+'° · Máx. '+Math.round(daily.temperature_2m_max[0])+'°';
+  $('forecast').innerHTML=daily.time.slice(0,4).map((date,i)=>{
+   const dt=new Date(date+'T12:00:00'); const name=i===0?'Hoje':i===1?'Amanhã':days[dt.getDay()];
+   const s=wx(daily.weather_code[i]);
+   return `<div class="day"><div class="dayname">${name}</div><div class="dayicon">${s[0]}</div><div class="daytemp">${Math.round(daily.temperature_2m_max[i])}° / ${Math.round(daily.temperature_2m_min[i])}°</div></div>`;
+  }).join('');
+  $('connection').textContent='● Previsão atualizada'; $('connection').style.color='#9bd8a7';
+  const now=new Date(); $('updated').textContent='Atualizado às '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  $('refresh').textContent='Próxima atualização em até 15 min';
+ }catch(e){
+  $('connection').textContent='Sem conexão com o serviço'; $('connection').style.color='#f1bd7a';
+  $('updated').textContent='O relógio continua funcionando';
+  $('refresh').textContent='Confira a conexão Wi-Fi';
+ }
+}
+clock();setInterval(clock,1000);loadWeather();setInterval(loadWeather,15*60*1000);
+</script>
+</body>
+</html>
